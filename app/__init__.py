@@ -5,6 +5,8 @@ import cloudinary
 
 login_manager.login_view = 'auth.login'
 
+
+
 def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
@@ -32,6 +34,7 @@ def create_app(config_class=Config):
 
     from app.routes.auth import auth
     from app.routes.main import main
+    from app.routes.chatbot import main
 
     app.register_blueprint(auth, url_prefix="/auth")
     app.register_blueprint(main, url_prefix="/")

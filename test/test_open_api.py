@@ -1,5 +1,8 @@
 from openai import OpenAI, AuthenticationError
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 print("start.....")
 client = OpenAI(
@@ -7,5 +10,4 @@ client = OpenAI(
 )
 
 
-print("Not working")
 print(client)

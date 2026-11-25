@@ -4,6 +4,7 @@ import hashlib
 from dotenv import load_dotenv
 
 load_dotenv()
+
 from app import create_app
 
 from extension import db
