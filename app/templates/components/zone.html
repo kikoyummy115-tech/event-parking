@@ -1,0 +1,58 @@
+{% macro zone_card(id, title, vehicle, location, location_link) %}
+<div
+  class="bg-base-100 w-90 shadow-sm group relative border-r-10 border-white hover:border-blue-500 rounded-xl"
+>
+  {% if current_user.is_authenticated and current_user.role == 'host' %}
+  <div
+    class="absolute top-3 right-3 z-10 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+  >
+    <!-- Delete Form/Button -->
+
+    <form
+      action="{{ url_for('main.delete_zone', zone_id=id) }}"
+      method="POST"
+      onsubmit="return confirm('Delete this course?');"
+    >
+      <button type="submit" class="btn btn-sm btn-error shadow">
+        <span class="material-symbols-outlined">delete</span>
+      </button>
+    </form>
+  </div>
+
+  {% endif %}
+  <div class="card-body">
+    <h2 class="card-title">
+      {% if vehicle == "car" %}
+      <span class="material-symbols-outlined"> directions_car </span>
+
+      {{ title }}{% endif %} {% if vehicle == "moto" %}
+      <span class="material-symbols-outlined"> motorcycle </span>
+      {{ title }} {% endif %} {% if vehicle == "dropOff" %}
+      <span class="material-symbols-outlined"> transportation </span>
+      {{ title }} {% endif %} {% if vehicle == "buss" %}
+      <span class="material-symbols-outlined"> bus_railway </span>
+      {{ title }} {% endif %}
+    </h2>
+    <p class="flex items-center gap-2">
+      <span class="material-symbols-outlined"> location_on </span>{{ location }}
+      <a
+        target="_blank"
+        rel="noopener noreferrer"
+        href="{{ location_link}}"
+        class="btn btn-outline text-xs"
+        >Get Location</a
+      >
+
+      <a
+        href="{{ url_for('main.click_capture')}}"
+        class="btn btn-info text-white text-xs"
+        >Book Parking Lot</a
+      >
+    </p>
+
+    <p class="flex items-center gap-2 font-semibold text-blue-600">
+      Entrance {{ title }} for {{ vehicle }}
+    </p>
+  </div>
+</div>
+{% endmacro %}

@@ -1,0 +1,207 @@
+{% extends "base.html" %} {% from 'components/event.html' import event_card with
+context %} {% block content %}
+
+<div class="px-4 mx-4 mt-4">
+  <form
+    action="{{ url_for('main.get_events') }}"
+    method="GET"
+    class="flex gap-2 max-w-md"
+  >
+    <input
+      type="text"
+      name="q"
+      value="{{ search_query or '' }}"
+      placeholder="Search events by title or location..."
+      class="input input-bordered w-full"
+    />
+    <button type="submit" class="btn bg-blue-600 text-white">Search</button>
+    {% if search_query %}
+    <a href="{{ url_for('main.get_events') }}" class="btn btn-ghost">Clear</a>
+    {% endif %}
+  </form>
+</div>
+
+<div class="p-4 m-4 grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4">
+  {% for event in events %} {{ event_card( id=event.id, title=event.title,
+  image_url=event.image_url, location=event.location,
+  start_date=event.start_date, end_date=event.end_date, time=event.time ) }} {%
+  else %}
+  <div class="col-span-full text-center py-10 text-gray-500">
+    No events found{% if search_query %} matching "{{ search_query }}"{% endif
+    %}.
+  </div>
+  {% endfor %} {% if pagination.pages > 1 %}
+  <div class="my-6">
+    <div class="join">
+      <!-- Previous Button -->
+      {% if pagination.has_prev %}
+      <a
+        href="{{ url_for('main.get_events', page=pagination.prev_num, q=search_query) }}"
+        class="join-item btn"
+        >«</a
+      >
+      {% else %}
+      <button class="join-item btn btn-disabled">«</button>
+      {% endif %}
+
+      <!-- Page Numbers -->
+      {% for page_num in pagination.iter_pages(left_edge=1, right_edge=1,
+      left_current=1, right_current=2) %} {% if page_num %}
+      <a
+        href="{{ url_for('main.get_events', page=page_num, q=search_query) }}"
+        class="join-item btn {{ 'btn-active btn-info' if page_num == pagination.page else '' }}"
+      >
+        {{ page_num }}
+      </a>
+      {% else %}
+      <span class="join-item btn btn-disabled">...</span>
+      {% endif %} {% endfor %}
+
+      <!-- Next Button -->
+      {% if pagination.has_next %}
+      <a
+        href="{{ url_for('main.get_events', page=pagination.next_num, q=search_query) }}"
+        class="join-item btn"
+        >»</a
+      >
+      {% else %}
+      <button class="join-item btn btn-disabled">»</button>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %} {% endblock %} {% block action %}
+
+  <label for="my_modal_6" class="btn btn-sm">
+    <span class="material-symbols-outlined">add_box</span> Event
+  </label>
+
+  <!-- Hidden Checkbox + Centered Modal -->
+  <input type="checkbox" id="my_modal_6" class="modal-toggle" />
+  <div class="modal" role="dialog">
+    <div class="modal-box w-11/12 max-w-4xl">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-bold">Create Course</h3>
+        <label for="my_modal_6" class="btn btn-sm btn-circle btn-ghost"
+          >✕</label
+        >
+      </div>
+
+      <!-- 2-Column Layout: Form on Left, Live Preview on Right -->
+      <div>
+        <!-- Left Column: Form -->
+        <form
+          action="{{ url_for('main.create_event') }}"
+          method="POST"
+          class="space-y-4"
+          enctype="multipart/form-data"
+        >
+          <div class="form-control w-full">
+            <label class="label"><span class="label-text">Title</span></label>
+            <input
+              type="text"
+              id="input-title"
+              placeholder="Cambodia Technology Innovative Application"
+              class="input input-bordered w-full"
+              name="title"
+              required
+            />
+          </div>
+
+          <div class="form-control w-full">
+            <label class="label">Location Name *</label>
+            <input
+              class="input input-bordered w-full"
+              type="text"
+              name="location"
+              maxlength="100"
+              required
+            />
+          </div>
+
+          <div>
+            <label class="input validator">
+              Location URL :
+              <input
+                type="text"
+                required
+                placeholder="https://"
+                pattern="^(https?://)?([a-zA-Z0-9]([a-zA-Z0-9\-].*[a-zA-Z0-9])?\.)+[a-zA-Z].*$"
+                title="Must be valid URL"
+                class="w-full"
+                name="location_link"
+              />
+            </label>
+            <p class="validator-hint">Must be valid URL</p>
+          </div>
+
+          <div>
+            <label>Start Date *</label>
+            <input
+              type="date"
+              name="start_date"
+              class="input input-bordered w-full"
+              required
+            />
+          </div>
+
+          <div>
+            <label>End Date *</label>
+            <input
+              type="date"
+              name="end_date"
+              class="input input-bordered w-full"
+              required
+            />
+          </div>
+
+          <div>
+            <label>Time of Event *</label>
+            <input
+              type="time"
+              name="time"
+              class="input input-boredered"
+              required
+            />
+          </div>
+
+          <div class="form-control w-full">
+            <label class="label"><span class="label-text">Image</span></label>
+            <input
+              type="file"
+              id="input-image"
+              class="input file-input w-full"
+              name="image"
+              accept="image/*"
+              required
+            />
+          </div>
+
+          <div class="form-control w-full">
+            <label class="label"
+              ><span class="label-text">Description</span></label
+            >
+
+            <textarea
+              id="input-description"
+              placeholder="For students who are interested in computer science..."
+              class="textarea textarea-bordered w-full h-32"
+              name="description"
+              required
+            ></textarea>
+          </div>
+
+          <div class="modal-action">
+            <label for="my_modal_6" class="btn btn-ghost">Cancel</label>
+            <button type="submit" class="btn btn-outline btn-info">
+              Submit
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Clicking the dark background closes the modal -->
+      <label class="modal-backdrop" for="my_modal_6">Close</label>
+    </div>
+  </div>
+  {% endblock %}
+</div>

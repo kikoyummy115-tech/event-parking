@@ -1,0 +1,244 @@
+{% extends "base.html" %} {% from 'components/zone.html' import zone_card with
+context %} {% block content %}
+<div
+  class="card bg-no-repeat bg-cover bg-center w-full h-100 shadow-sm group relative overflow-hidden"
+  style="background-image: url('{{ event.image_url }}')"
+>
+  <!-- Dark Overlay -->
+  <div class="absolute inset-0 bg-black/50"></div>
+
+  <!-- Content (stays bright) -->
+  <div class="card-body relative z-10">
+    <h1 class="text-white font-bold">YOUR UP COPMMING EVENT</h1>
+    <h1 class="text-white font-bold text-4xl">
+      {{ event.title }} {{ event.start_date.strftime("%Y") }}
+
+      <p class="flex items-center gap-2 p-2 text-lg">
+        <span class="material-symbols-outlined"> location_on </span>{{
+        event.location }}
+        <span>
+          <a
+            href="{{ event.location_link }}"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="btn btn-outline btn-info text-white"
+          >
+            Get Location In Google</a
+          >
+        </span>
+      </p>
+      <p class="flex items-center gap-2 p-2 text-lg">
+        <span class="material-symbols-outlined"> event </span> {{
+        event.start_date.strftime('%d') }} {{ event.end_date.strftime('%d') }}
+        {{ event.start_date.strftime('%b') }} {{
+        event.start_date.strftime('%Y')}}, Time {{ event.time.strftime('%I:%M
+        %p') }}
+      </p>
+
+      <label for="my_modal_7" class="btn rounded-full">
+        <span class="material-symbols-outlined"> qr_code </span> View Event QR
+        pass
+      </label>
+
+      <!-- Hidden Checkbox -->
+      <input type="checkbox" id="my_modal_7" class="modal-toggle" />
+
+      <!-- Missing Outer Modal Wrapper -->
+      <div class="modal" role="dialog">
+        <div class="modal-box w-11/12 max-w-4xl">
+          <div class="flex items-center justify-between mb-4">
+            <h1 class="text-blue-600 font-bold text-lg">EVENT ADMISSION</h1>
+          </div>
+          <!-- Moved outside the header flex container so it sits below the title -->
+          <h1 class="font-semibold text-lg text-black text-center">
+            Your EventKH pass
+          </h1>
+
+          <div class="flex flex-col items-center text-center gap-4">
+            <img
+              src="{{ url_for('static', filename='image/qr.png')}}"
+              class="flex justify-center"
+            />
+
+            <h1 class="font-semibold text-lg text-black">
+              {{ event.title }} {{ event.start_date.strftime('%Y') }}
+            </h1>
+            <h1 class="font-semibold text-lg text-black">
+              PASS ID : {{ event.id[0:5] }} {{ event.location }}
+            </h1>
+          </div>
+          <label
+            class="modal-backdrop btn bg-blue-600 text-white"
+            for="my_modal_7"
+            >Close</label
+          >
+        </div>
+      </div>
+    </h1>
+  </div>
+</div>
+
+<div class="">
+  <h1 class="font-semibold p-2 text-xl">Who is this event for?</h1>
+  <p class="flex items-center gap-2 p-2 text-sm font-medium text-slate-600">
+    {{ event.description }}
+  </p>
+
+  <hr />
+  <h1 class="font-semibold p-2 mt-2 text-xl">Nearby alternatives? ( Zone )</h1>
+
+  <div class="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 p-4 m-4">
+    {% for zone in zones %} {{ zone_card(id=zone.id, title=zone.title,
+    vehicle=zone.vehicle, location=zone.location,
+    location_link=zone.location_link)}} {% endfor %}
+  </div>
+</div>
+{% endblock %} {% block action %}
+
+<label for="my_modal_6" class="btn btn-sm">
+  <span class="material-symbols-outlined">add_box</span> Zone
+</label>
+
+<!-- Hidden Checkbox + Centered Modal -->
+<input type="checkbox" id="my_modal_6" class="modal-toggle" />
+<div class="modal" role="dialog">
+  <div class="modal-box w-11/12 max-w-4xl">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-lg font-bold">Create Course</h3>
+      <label for="my_modal_6" class="btn btn-sm btn-circle btn-ghost">✕</label>
+    </div>
+
+    <!-- 2-Column Layout: Form on Left, Live Preview on Right -->
+    <div>
+      <!-- Left Column: Form -->
+      <form
+        action="{{ url_for('main.create_zone', event_id=event.id) }}"
+        method="POST"
+        class="space-y-4"
+      >
+        <div class="form-control w-full">
+          <label class="label"><span class="label-text">Title</span></label>
+          <input
+            type="title"
+            id="input-title"
+            placeholder="eg,. Zone A or Zone ( name )"
+            class="input input-bordered w-full"
+            name="title"
+            required
+          />
+        </div>
+
+        <div class="form-control w-full">
+          <label class="label py-1" for="input-icon">
+            <span class="label-text font-medium">Vehicle</span>
+          </label>
+          <select
+            name="vehicle"
+            id="input-icon"
+            class="select select-bordered select-sm w-full"
+            required
+          >
+            <option value="car">Car</option>
+            <option value="moto">Moto</option>
+            <option value="dropOff">Drop-off</option>
+            <option value="buss">Bus</option>
+          </select>
+        </div>
+
+        <div class="form-control w-full">
+          <label class="label">Location Name *</label>
+          <input
+            class="input input-bordered w-full"
+            type="text"
+            name="location"
+            maxlength="100"
+            required
+          />
+        </div>
+
+        <div>
+          <label class="input validator">
+            Location URL :
+            <input
+              type="text"
+              placeholder="https://"
+              pattern="^(https?://)?([a-zA-Z0-9]([a-zA-Z0-9\-].*[a-zA-Z0-9])?\.)+[a-zA-Z].*$"
+              title="Must be valid URL"
+              class="w-full"
+              name="location_link"
+              required
+            />
+          </label>
+          <p class="validator-hint">Must be valid URL</p>
+        </div>
+
+        <div class="modal-action">
+          <label for="my_modal_6" class="btn btn-ghost">Cancel</label>
+          <button type="submit" class="btn btn-outline btn-info">Submit</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Clicking the dark background closes the modal -->
+    <label class="modal-backdrop" for="my_modal_6">Close</label>
+  </div>
+</div>
+{% endblock %} {% block ai_chat %}
+
+<!-- 1. AI Chat Popup Window (Hidden by default) -->
+<div
+  id="ai-chat-box"
+  class="hidden fixed bottom-24 right-6 w-80 sm:w-96 bg-base-100 shadow-2xl rounded-2xl border border-base-300 z-50 flex flex-col overflow-hidden"
+>
+  <!-- Chat Header -->
+  <div class="bg-blue-600 text-white p-4 flex justify-between items-center">
+    <div class="flex items-center gap-2">
+      <span class="font-bold">EventKH AI Assistant</span>
+    </div>
+    <button onclick="toggleChat()" class="btn btn-sm btn-circle btn-ghost">
+      ✕
+    </button>
+  </div>
+
+  <!-- Chat Messages Area -->
+  <div
+    id="chat-messages"
+    class="p-4 h-72 overflow-y-auto flex flex-col gap-2 bg-base-200"
+  >
+    <!-- AI Greeting -->
+    <div class="chat chat-start">
+      <div class="chat-bubble chat-bubble-info text-white text-sm">
+        Hi! Ask me anything.
+      </div>
+    </div>
+  </div>
+
+  <!-- Chat Input Form -->
+  <form
+    onsubmit="sendMessage(event)"
+    class="p-2 bg-base-100 border-t border-base-300 flex gap-2"
+  >
+    <input
+      type="text"
+      id="chat-input"
+      placeholder="Type your question..."
+      class="input input-bordered input-sm flex-1 focus:outline-none"
+      required
+    />
+    <button type="submit" class="btn bg-blue-600 text-white btn-sm">
+      Send
+    </button>
+  </form>
+</div>
+
+<!-- 2. Single Floating AI Chat Button -->
+<button
+  onclick="toggleChat()"
+  class="btn btn-lg btn-info btn-circle fixed bottom-6 right-6 shadow-lg z-50"
+  aria-label="Open AI Chat"
+>
+  AI
+</button>
+
+<script src="{{ url_for('static', filename='js/chatbot.js') }}"></script>
+{% endblock %}

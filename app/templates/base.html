@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    {% block head %}
+    <link href="{{ url_for('static', filename='styles.css')}}" />
+    <title>{% block title %}{% endblock %}</title>
+    {% endblock %}
+    <link
+      href="https://cdn.jsdelivr.net/npm/daisyui@5"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  </head>
+
+  <body>
+    <div class="navbar sticky top-0 z-50 bg-slate-100">
+      <div class="flex-1 font-medium text-blue-600">
+        <a
+          href="{{ url_for('main.get_events') }}"
+          class="btn bg-blue-600 text-xl text-white"
+          >KH</a
+        >
+        EVENTKH PARKING
+      </div>
+
+      <div class="flex-none">
+        {% if current_user.role == "host" %} {% block action %} {% endblock %}
+        {% endif %}
+
+        <a
+          class="btn text-white btn-error btn-xs"
+          href="{{ url_for('auth.logout')}}"
+          >Logout</a
+        >
+        <img class="" />
+      </div>
+    </div>
+    <div class="m4 p-4">
+      {% block content %}{% endblock %} {% block ai_chat %} {% endblock %}
+    </div>
+  </body>
+</html>
